@@ -13,7 +13,7 @@ proxyDict = {
     'ftp': ftp_proxy
 }
 
-use_proxy = True
+use_proxy = False
 
 base_url = "https://python-qa-training.herokuapp.com/api"
 login_endpoint = "/auth/login"
