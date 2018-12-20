@@ -1,5 +1,6 @@
 import requests
 
+# Proxy setup, used for debugging
 proxy_ip = '127.0.0.1'
 proxy_port = '8200'
 
@@ -20,50 +21,38 @@ login_endpoint = "/auth/login"
 issues_endpoint = "/issues"
 
 
-def login(email: str, password: str):
+def login(json: dict):
     path = base_url + login_endpoint
 
-    return requests.post(path, json={"email": email, "password": password}, proxies=proxyDict if use_proxy else None,
-                         verify=False if use_proxy else None)
+    return requests.post(path, json=json, proxies=[None, proxyDict][use_proxy], verify=[None, False][use_proxy])
 
 
 def get_issues(token):
     path = base_url + issues_endpoint
     headers = {'x-access-token': token}
 
-    return requests.get(path, headers=headers, proxies=proxyDict if use_proxy else None, verify=False if use_proxy
-                        else None)
+    return requests.get(path, headers=headers, proxies=[None, proxyDict][use_proxy], verify=[None, False][use_proxy])
 
 
-def create_issue(summary, description, priority, token):
+def create_issue(json: dict, token):
     path = base_url + issues_endpoint
     headers = {'x-access-token': token}
 
-    json = {"summary": summary, "description": description, "priority": priority}
-
-    return requests.post(path, json=json, headers=headers, proxies=proxyDict if use_proxy else None,
-                         verify=False if use_proxy else None)
+    return requests.post(path, json=json, headers=headers, proxies=[None, proxyDict][use_proxy],
+                         verify=[None, False][use_proxy])
 
 
-def update_issue(token, issue_id, summary=None, description=None, priority=None):
+# Not sure about passing None values as default
+def update_issue(token, issue_id: str, json: dict):
     path = "{}{}/{}".format(base_url, issues_endpoint, issue_id)
     headers = {'x-access-token': token}
 
-    json = {}
-    if summary:
-        json['summary'] = summary
-    if description:
-        json['description'] = description
-    if priority:
-        json['priority'] = priority
-
-    return requests.patch(path, json=json, headers=headers, proxies=proxyDict if use_proxy else None,
-                          verify=False if use_proxy else None)
+    return requests.patch(path, json=json, headers=headers, proxies=[None, proxyDict][use_proxy],
+                          verify=[None, False][use_proxy])
 
 
-def delete_issue(issue_id, token):
+def delete_issue(issue_id: str, token):
     path = "{}{}/{}".format(base_url, issues_endpoint, issue_id)
     headers = {'x-access-token': token}
 
-    return requests.delete(path, headers=headers, proxies=proxyDict if use_proxy else None,
-                          verify=False if use_proxy else None)
+    return requests.delete(path, headers=headers, proxies=[None, proxyDict][use_proxy], verify=[None, False][use_proxy])
