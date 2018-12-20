@@ -13,20 +13,22 @@ proxyDict = {
     'ftp': ftp_proxy
 }
 
-use_proxy = False
+use_proxy = True
 
-endpoint = "https://python-qa-training.herokuapp.com/api"
+base_url = "https://python-qa-training.herokuapp.com/api"
+login_endpoint = "/auth/login"
+issues_endpoint = "/issues"
 
 
-def login(email, password):
-    path = endpoint + "/auth/login"
+def login(email: str, password: str):
+    path = base_url + login_endpoint
 
     return requests.post(path, json={"email": email, "password": password}, proxies=proxyDict if use_proxy else None,
                          verify=False if use_proxy else None)
 
 
 def get_issues(token):
-    path = endpoint + "/issues"
+    path = base_url + issues_endpoint
     headers = {'x-access-token': token}
 
     return requests.get(path, headers=headers, proxies=proxyDict if use_proxy else None, verify=False if use_proxy
@@ -34,8 +36,34 @@ def get_issues(token):
 
 
 def create_issue(summary, description, priority, token):
-    path = endpoint + "/issues"
+    path = base_url + issues_endpoint
     headers = {'x-access-token': token}
 
-    return requests.post(path, json={"summary": summary, "description": description, "priority": priority},
-                         headers=headers, proxies=proxyDict if use_proxy else None, verify=False if use_proxy else None)
+    json = {"summary": summary, "description": description, "priority": priority}
+
+    return requests.post(path, json=json, headers=headers, proxies=proxyDict if use_proxy else None,
+                         verify=False if use_proxy else None)
+
+
+def update_issue(token, issue_id, summary=None, description=None, priority=None):
+    path = "{}{}/{}".format(base_url, issues_endpoint, issue_id)
+    headers = {'x-access-token': token}
+
+    json = {}
+    if summary:
+        json['summary'] = summary
+    if description:
+        json['description'] = description
+    if priority:
+        json['priority'] = priority
+
+    return requests.patch(path, json=json, headers=headers, proxies=proxyDict if use_proxy else None,
+                          verify=False if use_proxy else None)
+
+
+def delete_issue(issue_id, token):
+    path = "{}{}/{}".format(base_url, issues_endpoint, issue_id)
+    headers = {'x-access-token': token}
+
+    return requests.delete(path, headers=headers, proxies=proxyDict if use_proxy else None,
+                          verify=False if use_proxy else None)
