@@ -7,7 +7,7 @@ def get_current_timestamp():
 
 
 def get_random_priority():
-    prio_min = 1
-    prio_max = 5
+    priority_min = 1
+    priority_max = 5
 
-    return random.randint(prio_min, prio_max)
+    return random.randint(priority_min, priority_max)

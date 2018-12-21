@@ -1,38 +1,33 @@
-import common_requests
-from data.valid_user import ValidUser
-from data.invalid_user import InvalidUser
-
-
-def test_login_valid_credentials():
-    response = common_requests.login(ValidUser.email, ValidUser.password)
+def test_login_valid_credentials(client, json_p, valid_user):
+    response = client.login(json_p.login_json(valid_user.email, valid_user.password))
 
     assert response.status_code == 200
     assert response.json()['token'] is not None
 
 
-def test_login_invalid_password():
-    response = common_requests.login(ValidUser.email, InvalidUser.password)
+def test_login_invalid_password(client, json_p, valid_user, invalid_user):
+    response = client.login(json_p.login_json(valid_user.email, invalid_user.password))
 
     assert response.status_code == 401
     assert response.json()['token'] is None
 
 
-def test_login_invalid_username():
-    response = common_requests.login(InvalidUser.email, ValidUser.password)
+def test_login_invalid_username(client, json_p, valid_user, invalid_user):
+    response = client.login(json_p.login_json(invalid_user.email, valid_user.password))
 
     assert response.status_code == 404
 
 
-def test_login_invalid_credentials():
-    response = common_requests.login(InvalidUser.email, InvalidUser.password)
+def test_login_invalid_credentials(client, json_p, invalid_user):
+    response = client.login(json_p.login_json(invalid_user.email, invalid_user.password))
 
     assert response.status_code == 404
 
 
-def test_login_empty_fields():
+def test_login_empty_fields(client, json_p):
     email = ""
     password = ""
 
-    response = common_requests.login(email, password)
+    response = client.login(json_p.login_json(email, password))
 
     assert response.status_code == 404
